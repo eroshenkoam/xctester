@@ -1,4 +1,4 @@
-package main
+package xcrun
 
 import (
 	"bytes"
@@ -15,8 +15,7 @@ func readSummary(path string) (data gjson.Result) {
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 	return gjson.Parse(out.String())
@@ -31,8 +30,7 @@ func readReference(path string, id string) (data gjson.Result) {
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 	return gjson.Parse(out.String())
@@ -48,8 +46,7 @@ func exportReference(path string, id string, output string) {
 	var out bytes.Buffer
 	cmd.Stdout = &out
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
