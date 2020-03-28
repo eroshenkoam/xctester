@@ -16,7 +16,7 @@ type Attachment struct {
 
 func main() {
 	input := "/Users/eroshenkoam/Downloads/result.xcresult"
-	output := "/Users/eroshenkoam/Downloads/allure-results"
+	output := "/Users/eroshenkoam/Developer/eroshenkoam/go-example/allure-results"
 
 	testRefs := make(chan string)
 	go extractTestRefs(input, testRefs)
@@ -98,8 +98,10 @@ func exportAttachments(path string, output string, attachments chan Attachment) 
 
 func exportResults(output string, results chan allure.TestResult) {
 	for result := range results {
-		resultJson, _ := json.Marshal(result)
-		resultFile := filepath.Join(output, uuid.New().String()+"-result.json")
-		ioutil.WriteFile(resultFile, resultJson, 0644)
+		if result.FullName == "SnapshotEditSubscriptionsList/testEditSubscriptionsList()" && len(result.Steps) == 5 {
+			resultJson, _ := json.Marshal(result)
+			resultFile := filepath.Join(output, uuid.New().String()+"-result.json")
+			ioutil.WriteFile(resultFile, resultJson, 0644)
+		}
 	}
 }

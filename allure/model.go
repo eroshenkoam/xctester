@@ -14,12 +14,14 @@ type TestResult struct {
 	FullName string `json:"fullName"`
 
 	HistoryId string `json:"historyId,omitempty"`
-	Status    Status `json:"status"`
+
+	Status        Status        `json:"status"`
+	StatusDetails StatusDetails `json:"statusDetails,omitempty"`
 
 	Steps []StepResult `json:"steps"`
 
-	Start int `json:"start"`
-	Stop  int `json:"stop"`
+	Start int64 `json:"start"`
+	Stop  int64 `json:"stop"`
 
 	Labels      []Label      `json:"labels"`
 	Parameters  []Parameter  `json:"parameters"`
@@ -43,20 +45,22 @@ type Attachment struct {
 }
 
 type StepResult struct {
-	Name   string `json:"name"`
-	Status Status `json:"status"`
+	Name string `json:"name"`
 
-	Start int `json:"start"`
-	Stop  int `json:"stop"`
+	Status        Status        `json:"status"`
+	StatusDetails StatusDetails `json:"statusDetails,omitempty"`
 
-	Steps       []StepResult `json:"steps"`
-	Parameters  []Parameter  `json:"parameters"`
-	Attachments []Attachment `json:"attachments"`
+	Start int64 `json:"start"`
+	Stop  int64 `json:"stop"`
+
+	Steps       []StepResult `json:"steps,omitempty"`
+	Parameters  []Parameter  `json:"parameters,omitempty"`
+	Attachments []Attachment `json:"attachments,omitempty"`
 }
 
 type Status string
 
 type StatusDetails struct {
-	Message string `json:"message"`
+	Message string `json:"message,omitempty"`
 	Trace   string `json:"trace,omitempty"`
 }
