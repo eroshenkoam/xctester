@@ -1,12 +1,17 @@
 package main
 
 import (
-	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+	"regexp"
+
+	json "github.com/json-iterator/go"
+
 	"github.com/eroshennkoam/xcresults/allure"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
-	"io/ioutil"
-	"path/filepath"
 )
 
 type Attachment struct {
@@ -15,8 +20,13 @@ type Attachment struct {
 }
 
 func main() {
-	input := "/Users/eroshenkoam/Downloads/one.xcresult"
-	output := "/Users/eroshenkoam/Developer/eroshenkoam/go-example/allure-results"
+	currentDir, _ := os.Getwd()
+	input := getFileByExtension(".xcresult")
+	output := currentDir + "/allure-results"
+
+	if _, err := os.Stat(output); os.IsNotExist(err) {
+		os.Mkdir(output, 0700)
+	}
 
 	testRefs := make(chan string)
 	go extractTestRefs(input, testRefs)
@@ -31,6 +41,26 @@ func main() {
 	go exportResults(output, results)
 
 	exportSummaryRefs(input, summaryRefs, results, attachments)
+}
+
+func getFileByExtension(ext string) string {
+
+	pathS, err := os.Getwd()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var files []string
+	filepath.Walk(pathS, func(path string, f os.FileInfo, _ error) error {
+		if !f.IsDir() {
+			r, err := regexp.MatchString(ext, f.Name())
+			if err == nil && r {
+				files = append(files, f.Name())
+			}
+		}
+		return nil
+	})
+	return files[0]
 }
 
 func extractTestRefs(path string, testRefIds chan string) {

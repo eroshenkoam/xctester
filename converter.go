@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/eroshennkoam/xcresults/allure"
-	"github.com/tidwall/gjson"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/eroshennkoam/xcresults/allure"
+	"github.com/tidwall/gjson"
 )
 
 const (
