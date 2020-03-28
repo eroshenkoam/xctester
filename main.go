@@ -69,13 +69,13 @@ func extractAttachments(activity gjson.Result, attachments chan Attachment) {
 	for _, child := range activity.Get("subactivities._values").Array() {
 		extractAttachments(child, attachments)
 	}
-	for _, attachment := range activity.Get("attachments._values").Array() {
-		if attachment.Get("payloadRef").Exists() {
-			name := attachment.Get("filename._value").Str
-			ref := attachment.Get("payloadRef.id._value").Str
-			attachments <- Attachment{name: name, ref: ref}
-		}
-	}
+	//for _, attachment := range activity.Get("attachments._values").Array() {
+	//	if attachment.Get("payloadRef").Exists() {
+	//		name := attachment.Get("filename._value").Str
+	//		ref := attachment.Get("payloadRef.id._value").Str
+	//		attachments <- Attachment{name: name, ref: ref}
+	//	}
+	//}
 }
 
 func exportSummaryRefs(path string, refs chan string, results chan allure.TestResult, attachments chan Attachment) {

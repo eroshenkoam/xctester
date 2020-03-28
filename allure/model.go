@@ -1,12 +1,22 @@
 package allure
 
+const (
+	Skipped Status = "skipped"
+	Passed  Status = "passed"
+	Failed  Status = "failed"
+	Broken  Status = "broken"
+	Unknown Status = "unknown"
+)
+
 type TestResult struct {
 	Uuid     string `json:"uuid"`
 	Name     string `json:"name"`
 	FullName string `json:"fullName"`
 
-	HistoryId string `json:"historyId"`
-	Status    string `json:"status"`
+	HistoryId string `json:"historyId,omitempty"`
+	Status    Status `json:"status"`
+
+	Steps []StepResult `json:"steps"`
 
 	Start int `json:"start"`
 	Stop  int `json:"stop"`
@@ -34,7 +44,7 @@ type Attachment struct {
 
 type StepResult struct {
 	Name   string `json:"name"`
-	Status string `json:"status"`
+	Status Status `json:"status"`
 
 	Start int `json:"start"`
 	Stop  int `json:"stop"`
@@ -42,4 +52,11 @@ type StepResult struct {
 	Steps       []StepResult `json:"steps"`
 	Parameters  []Parameter  `json:"parameters"`
 	Attachments []Attachment `json:"attachments"`
+}
+
+type Status string
+
+type StatusDetails struct {
+	Message string `json:"message"`
+	Trace   string `json:"trace,omitempty"`
 }
