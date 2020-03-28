@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/eroshennkoam/xcresults/allure"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
@@ -15,7 +16,7 @@ type Attachment struct {
 }
 
 func main() {
-	input := "/Users/eroshenkoam/Downloads/result.xcresult"
+	input := "/Users/eroshenkoam/Downloads/one.xcresult"
 	output := "/Users/eroshenkoam/Developer/eroshenkoam/go-example/allure-results"
 
 	testRefs := make(chan string)
@@ -69,13 +70,13 @@ func extractAttachments(activity gjson.Result, attachments chan Attachment) {
 	for _, child := range activity.Get("subactivities._values").Array() {
 		extractAttachments(child, attachments)
 	}
-	//for _, attachment := range activity.Get("attachments._values").Array() {
-	//	if attachment.Get("payloadRef").Exists() {
-	//		name := attachment.Get("filename._value").Str
-	//		ref := attachment.Get("payloadRef.id._value").Str
-	//		attachments <- Attachment{name: name, ref: ref}
-	//	}
-	//}
+	for _, attachment := range activity.Get("attachments._values").Array() {
+		if attachment.Get("payloadRef").Exists() {
+			name := attachment.Get("filename._value").Str
+			ref := attachment.Get("payloadRef.id._value").Str
+			attachments <- Attachment{name: name, ref: ref}
+		}
+	}
 }
 
 func exportSummaryRefs(path string, refs chan string, results chan allure.TestResult, attachments chan Attachment) {
@@ -84,10 +85,12 @@ func exportSummaryRefs(path string, refs chan string, results chan allure.TestRe
 		for _, activitySummary := range summary.Get("activitySummaries._values").Array() {
 			extractAttachments(activitySummary, attachments)
 		}
-		results <- convertSummary(summary)
+		result := convertSummary(summary)
+		fmt.Println("Export test case", result.Name)
+		results <- result
 	}
-	close(results)
 	close(attachments)
+	close(results)
 }
 
 func exportAttachments(path string, output string, attachments chan Attachment) {
@@ -98,10 +101,8 @@ func exportAttachments(path string, output string, attachments chan Attachment) 
 
 func exportResults(output string, results chan allure.TestResult) {
 	for result := range results {
-		if result.FullName == "SnapshotEditSubscriptionsList/testEditSubscriptionsList()" && len(result.Steps) == 5 {
-			resultJson, _ := json.Marshal(result)
-			resultFile := filepath.Join(output, uuid.New().String()+"-result.json")
-			ioutil.WriteFile(resultFile, resultJson, 0644)
-		}
+		resultJson, _ := json.Marshal(result)
+		resultFile := filepath.Join(output, uuid.New().String()+"-result.json")
+		ioutil.WriteFile(resultFile, resultJson, 0644)
 	}
 }

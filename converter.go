@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/eroshennkoam/xcresults/allure"
 	"github.com/tidwall/gjson"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -32,69 +33,55 @@ type Status struct {
 	Details allure.StatusDetails
 }
 
-func convertSummary(summary gjson.Result) (_ allure.TestResult) {
-	testResult := allure.TestResult{}
-	testResult.Name = value(summary, Name)
-	testResult.FullName = value(summary, Identifier)
-	testResult.Status = status(summary)
+func convertSummary(summary gjson.Result) (result allure.TestResult) {
+	result = allure.TestResult{}
+	result.Name = value(summary, Name)
+	result.FullName = value(summary, Identifier)
+	result.Status = status(summary)
 
-	status, steps := parseActivities(summary)
-	testResult.Steps = steps
-	testResult.Status = status.Name
-	testResult.StatusDetails = status.Details
-
-	return testResult
+	status, labels, steps := parseSubActivities(summary.Get(ActivitySummaries).Array())
+	result.Steps = steps
+	result.Labels = labels
+	result.Status = status.Name
+	result.StatusDetails = status.Details
+	return result
 }
 
-func parseActivities(node gjson.Result) (status Status, steps []allure.StepResult) {
+func parseSubActivities(activities []gjson.Result) (status Status, labels []allure.Label, steps []allure.StepResult) {
 	steps = []allure.StepResult{}
+	labels = []allure.Label{}
 	status = Status{Name: allure.Passed}
-	for _, subactibity := range node.Get(ActivitySummaries).Array() {
-		title := subactibity.Get(Title).Str
-		step := allure.StepResult{Name: title}
+	for _, activity := range activities {
+		title := activity.Get(Title).Str
 
-		substatus, substeps := parseSubActivities(subactibity)
-		if substatus.Name == allure.Failed {
-			status.Name = substatus.Name
-			status.Details = substatus.Details
+		labelMatcher := regexp.MustCompile(`allure\.label\.(?P<name>.*):(?P<value>.*)`)
+		if labelMatcher.MatchString(title) {
+			for _, group := range labelMatcher.FindAllStringSubmatch(title, -1) {
+				labels = append(labels, allure.Label{Name: group[1], Value: group[2]})
+			}
+			continue
 		}
-		step.StatusDetails = substatus.Details
-		step.Status = substatus.Name
-		step.Steps = substeps
 
-		steps = append(steps, step)
-	}
-	return status, steps
-}
-
-func parseSubActivities(node gjson.Result) (status Status, steps []allure.StepResult) {
-	steps = []allure.StepResult{}
-	status = Status{Name: allure.Passed}
-	for _, subActibity := range node.Get(SubActivities).Array() {
-		title := subActibity.Get(Title).Str
+		step := allure.StepResult{Name: title, Status: allure.Passed}
+		if activity.Get(Start).Exists() && activity.Get(Finish).Exists() {
+			step.Start = date(activity.Get(Start).Str)
+			step.Start = date(activity.Get(Finish).Str)
+		}
 		if strings.HasPrefix(title, "Assertion Failure:") {
-			status.Details = allure.StatusDetails{Message: title}
-			status.Name = allure.Failed
-			break
+			status = Status{Name: allure.Failed, Details: allure.StatusDetails{Message: title}}
+			step.StatusDetails = status.Details
+			step.Status = status.Name
 		}
-		step := allure.StepResult{Name: title}
-		if subActibity.Get(Start).Exists() && subActibity.Get(Finish).Exists() {
-			step.Start = date(subActibity.Get(Start).Str)
-			step.Start = date(subActibity.Get(Finish).Str)
+		substatus, sublabels, substeps := parseSubActivities(activity.Get(SubActivities).Array())
+		if substatus.Name != allure.Passed {
+			status = Status{Name: substatus.Name, Details: substatus.Details}
+			step.Status = status.Name
 		}
-
-		substatus, substeps := parseSubActivities(subActibity)
-		if substatus.Name == allure.Failed {
-			status.Name = substatus.Name
-			status.Details = substatus.Details
-		}
-		step.StatusDetails = substatus.Details
-		step.Status = substatus.Name
 		step.Steps = substeps
-
 		steps = append(steps, step)
+		labels = append(labels, sublabels...)
 	}
-	return status, steps
+	return status, labels, steps
 }
 
 func date(value string) int64 {
