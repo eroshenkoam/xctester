@@ -1,4 +1,4 @@
-package main
+package xcrun
 
 import (
 	"fmt"
@@ -26,7 +26,6 @@ const (
 
 const (
 	Filename string = "filename._value"
-	Payload  string = "payloadRef.id._value"
 )
 
 const (
