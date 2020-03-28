@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/eroshennkoam/xcresults/allure"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
@@ -82,12 +81,10 @@ func extractAttachments(activity gjson.Result, attachments chan Attachment) {
 func exportSummaryRefs(path string, refs chan string, results chan allure.TestResult, attachments chan Attachment) {
 	for summaryRef := range refs {
 		summary := readReference(path, summaryRef)
+		results <- convertSummary(summary)
 		for _, activitySummary := range summary.Get("activitySummaries._values").Array() {
 			extractAttachments(activitySummary, attachments)
 		}
-		result := convertSummary(summary)
-		fmt.Println("Export test case", result.Name)
-		results <- result
 	}
 	close(attachments)
 	close(results)

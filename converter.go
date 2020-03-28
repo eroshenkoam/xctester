@@ -20,7 +20,13 @@ const (
 	Title         string = "title._value"
 	Start         string = "start._value"
 	Finish        string = "finish._value"
+	Attachments   string = "attachments._values"
 	SubActivities string = "subactivities._values"
+)
+
+const (
+	Filename string = "filename._value"
+	Payload  string = "payloadRef.id._value"
 )
 
 const (
@@ -40,10 +46,15 @@ func convertSummary(summary gjson.Result) (result allure.TestResult) {
 	result.Status = status(summary)
 
 	status, labels, steps := parseSubActivities(summary.Get(ActivitySummaries).Array())
+
 	result.Steps = steps
 	result.Labels = labels
 	result.Status = status.Name
 	result.StatusDetails = status.Details
+
+	result.Start = steps[0].Start
+	result.Stop = steps[len(steps)-1].Stop
+
 	return result
 }
 
@@ -65,7 +76,7 @@ func parseSubActivities(activities []gjson.Result) (status Status, labels []allu
 		step := allure.StepResult{Name: title, Status: allure.Passed}
 		if activity.Get(Start).Exists() && activity.Get(Finish).Exists() {
 			step.Start = date(activity.Get(Start).Str)
-			step.Start = date(activity.Get(Finish).Str)
+			step.Stop = date(activity.Get(Finish).Str)
 		}
 		if strings.HasPrefix(title, "Assertion Failure:") {
 			status = Status{Name: allure.Failed, Details: allure.StatusDetails{Message: title}}
@@ -77,11 +88,22 @@ func parseSubActivities(activities []gjson.Result) (status Status, labels []allu
 			status = Status{Name: substatus.Name, Details: substatus.Details}
 			step.Status = status.Name
 		}
+		step.Attachments = attachments(activity.Get(Attachments).Array())
 		step.Steps = substeps
+
 		steps = append(steps, step)
 		labels = append(labels, sublabels...)
 	}
 	return status, labels, steps
+}
+
+func attachments(nodes []gjson.Result) (attachments []allure.Attachment) {
+	attachments = []allure.Attachment{}
+	for _, node := range nodes {
+		attachment := allure.Attachment{Name: node.Get(Filename).Str, Source: node.Get(Filename).Str}
+		attachments = append(attachments, attachment)
+	}
+	return attachments
 }
 
 func date(value string) int64 {
@@ -90,7 +112,7 @@ func date(value string) int64 {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return t.Unix()
+	return t.UnixNano() / int64(time.Millisecond)
 }
 
 func value(summary gjson.Result, key string) string {

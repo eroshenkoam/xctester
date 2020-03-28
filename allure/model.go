@@ -41,7 +41,7 @@ type Parameter struct {
 type Attachment struct {
 	Name     string `json:"name"`
 	Source   string `json:"source"`
-	MimeType string `json:"type"`
+	MimeType string `json:"type,omitempty"`
 }
 
 type StepResult struct {
