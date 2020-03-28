@@ -98,7 +98,7 @@ func exportResults(output string, results chan allure.TestResult) {
 	for result := range results {
 		resultJson, _ := json.Marshal(result)
 		resultFile := filepath.Join(output, uuid.New().String()+"-result.json")
-		if err := ioutil.WriteFile(resultFile, resultJson, 0700); err != nil {
+		if err := ioutil.WriteFile(resultFile, resultJson, 0744); err != nil {
 			log.Fatalln("Can not create result file [", resultFile, "] because ", err)
 		}
 	}

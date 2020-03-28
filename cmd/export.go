@@ -33,7 +33,7 @@ var exportCmd = &cobra.Command{
 		}
 		if _, err := os.Stat(output); os.IsNotExist(err) {
 			log.Println("Creating output directory")
-			if err := os.Mkdir(output, 0700); err != nil {
+			if err := os.Mkdir(output, 0744); err != nil {
 				log.Fatalln("Can not create output directory...")
 			}
 		}
