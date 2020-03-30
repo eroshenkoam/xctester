@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-go@v2-beta
         with:
           go-version: '^1.14'
-      - run: go build -o xctester cmd/xctester
+      - run: go build -o xctester cmd/xctester/main.go
       - name: "Upload binaries"
         uses: actions/upload-release-asset@v1.0.1
         env:
