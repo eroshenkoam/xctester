@@ -1,7 +1,7 @@
-package cmd
+package commands
 
 import (
-	"github.com/eroshennkoam/xcresults/xcrun"
+	"github.com/eroshenkoam/xctester/xcresult"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -37,7 +37,7 @@ var exportCmd = &cobra.Command{
 				log.Fatalln("Can not create output directory...")
 			}
 		}
-		xcrun.Export(input, output)
+		xcresult.Export(input, output)
 	},
 }
 

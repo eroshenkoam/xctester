@@ -1,4 +1,4 @@
-package xcrun
+package xcresult
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-# xcresults
+# xctester
 
 A command line tool to extract test summaries & screenshots from Xcode 11 XCResult files.
 
@@ -6,21 +6,21 @@ A command line tool to extract test summaries & screenshots from Xcode 11 XCResu
 
 Download latest version from github releases: 
 
-`wget https://github.com/eroshenkoam/xcresults/releases/latest/download/xcresults`
+`wget https://github.com/eroshenkoam/xctester/releases/latest/download/xctester`
 
 And make it executable: 
 
-`chmod +x xcresults`
+`chmod +x xctester`
 
 ## Usage
 
-`xcresults <command> <options>`
+`xctester <command> <options>`
 
 Below are a few examples of common commands. For further assistance, use the --help option on any command
 
 ### Export to Allure2 results
 
-`xcresults export /path/to/Test.xcresult`
+`xctester export /path/to/Test.xcresult`
 
 After that you can generate Allure report by following command: 
 

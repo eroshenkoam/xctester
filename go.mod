@@ -1,4 +1,4 @@
-module github.com/eroshennkoam/xcresults
+module github.com/eroshenkoam/xctester
 
 go 1.14
 

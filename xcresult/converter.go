@@ -1,8 +1,8 @@
-package xcrun
+package xcresult
 
 import (
 	"fmt"
-	"github.com/eroshennkoam/xcresults/allure"
+	"github.com/eroshenkoam/xctester/allure"
 	"github.com/tidwall/gjson"
 	"regexp"
 	"strings"

@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 var RootCmd = &cobra.Command{
-	Use:   "xcresults",
+	Use:   "xctester",
 	Short: "Tool for parsing Xcode 11+ xcresult",
 }
 
