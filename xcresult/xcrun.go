@@ -1,4 +1,4 @@
-package xcrun
+package xcresult
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 )
 
 func readSummary(path string) (data gjson.Result) {
-	cmd := exec.Command("xcrun", "xcresulttool", "get",
+	cmd := exec.Command("xcresult", "xcresulttool", "get",
 		"--format", "json",
 		"--path", path)
 
@@ -22,7 +22,7 @@ func readSummary(path string) (data gjson.Result) {
 }
 
 func readReference(path string, id string) (data gjson.Result) {
-	cmd := exec.Command("xcrun", "xcresulttool", "get",
+	cmd := exec.Command("xcresult", "xcresulttool", "get",
 		"--format", "json",
 		"--path", path,
 		"--id", id)
@@ -37,7 +37,7 @@ func readReference(path string, id string) (data gjson.Result) {
 }
 
 func exportReference(path string, id string, output string) {
-	cmd := exec.Command("xcrun", "xcresulttool", "export",
+	cmd := exec.Command("xcresult", "xcresulttool", "export",
 		"--type", "file",
 		"--path", path,
 		"--id", id,

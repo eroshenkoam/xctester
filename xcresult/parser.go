@@ -1,8 +1,8 @@
-package xcrun
+package xcresult
 
 import (
 	"encoding/json"
-	"github.com/eroshennkoam/xcresults/allure"
+	"github.com/eroshenkoam/xctester/allure"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
