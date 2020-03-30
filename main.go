@@ -9,4 +9,3 @@ func main() {
 	log.SetPrefix("xctester: ")
 	commands.Execute()
 }
-
